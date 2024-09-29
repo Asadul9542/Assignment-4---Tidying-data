@@ -1,0 +1,66 @@
+---
+title: "Tidying and Transforming Data"
+author: "MD Asadul Islam"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+### Read data from the CSV file
+
+```{r code-chunk-label}
+# Read the csv file
+data <- read.csv("C:\\Users\\HP\\Documents\\arrival delays for two airlines.csv")
+print(data)
+
+```
+The above section reads data from a CSV file and inspects it for any inconsistencies
+### Tidy the data using tidyr and diplyr
+
+```{R code chunk for tidying data}
+tidy_airline_data <- data %>%
+ pivot_longer(cols = c(`Los.Angeles`, Phoenix, `San.Diego`, `San.Francisco`, Seattle), 
+               names_to = "Destination", 
+               values_to = "Count") %>%
+  arrange(Airline, Status, Destination)
+
+print(tidy_airline_data)
+```
+In this section the data was tidied using the `tidyr` and `dplyr` packages in R. The `pivot_longer` function was used to reshape the data into a long format, making it easier to analyze and visualize
+
+### Analysis to Compare the Arrival Delays
+
+```{r code chunk for analysis}
+# Summarize the on-time and delayed counts by airline
+summary_delays <- tidy_airline_data %>%
+  group_by(Airline, Status) %>%
+  summarize(Total_Count = sum(Count))
+print(summary_delays)
+
+# Plot the delays
+ggplot(tidy_airline_data, aes(x = Destination, y = Count, fill = Status)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Airline) +
+  theme_minimal() +
+  labs(title = "Comparison of Arrival Delays by Airline",
+       x = "Destination",
+       y = "Count",
+       fill = "Status")
+
+```
+
+The above section has the summary statistics. The summary statistics for the on-time and delayed counts were calculated for each airline. The total counts were determined for both statuses. Additionally, a bar plot was created to visually compare the arrival delays for the two airlines across different destinations.
+
+### Conclusion
+
+Based on the analysis, it appears that Am West has a significantly higher count of on-time arrivals compared to Alaska, especially for the Phoenix destination. However, Am West also has a higher count of delays compared to Alaska. The visualizations provide a clear comparison of the performance of the two airlines across different destinations for the two statuses.
+
+...
+
